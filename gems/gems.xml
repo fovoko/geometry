@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>gems</name>
+    </assembly>
+    <members>
+        <member name="M:gems.Controllers.FiguresController.GetFigure(System.Int64)">
+             <summary>
+             Calculates square for figure with requested Id.
+             </summary>
+            <remarks>
+             
+                 GET /api/figure/2
+            
+             </remarks>
+             <response code="200">Identificator of new figure</response>
+        </member>
+        <member name="M:gems.Controllers.FiguresController.PutFigure(System.Int64,gems.common.Geometry.Figure)">
+             <summary>
+             Accepts request body content as figure ("circle" and "triangle") and updates data in persistent storage.
+             </summary>
+            <remarks>
+             
+             Circle:
+            
+                 POST /api/figure/1
+                 {
+                     "circle": 
+                     {
+                         "center": {"x": 2, "y": 2},
+                         "radius": 10
+                     }
+                 }
+            
+             Triangle:
+            
+                 POST /api/figure/2
+                 {
+                     "triangle": 
+                     {
+                         "a": {"x": 0, "y": 0},
+                         "b": {"x": 0, "y": 3},
+                         "c": {"x": 4, "y": 0}
+                     }
+                 }
+            
+             </remarks>
+             <response code="204"></response>
+        </member>
+        <member name="M:gems.Controllers.FiguresController.PostFigure(gems.common.Geometry.Figure)">
+             <summary>
+             Accepts request body content as figure ("circle" and "triangle") and saves data in persistent storage.
+             </summary>
+            <remarks>
+             
+             Circle:
+            
+                 POST /api/figure
+                 {
+                     "circle": 
+                     {
+                         "center": {"x": 2, "y": 2},
+                         "radius": 10
+                     }
+                 }
+            
+             Triangle:
+            
+                 POST /api/figure
+                 {
+                     "triangle": 
+                     {
+                         "a": {"x": 0, "y": 0},
+                         "b": {"x": 0, "y": 3},
+                         "c": {"x": 4, "y": 0}
+                     }
+                 }
+            
+             </remarks>
+             <response code="200">Identificator of new figure</response>
+        </member>
+        <member name="M:gems.Controllers.FiguresController.DeleteFigure(System.Int64)">
+             <summary>
+             Deletes figure with requested Id from persistent storage.
+             </summary>
+            <remarks>
+             
+                 DELETE /api/figure/2
+            
+             </remarks>
+             <response code="200">Identificator of new figure</response>
+        </member>
+        <member name="M:gems.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:gems.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Gems.SqliteDb.Db.FigureDbContext)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+            <param name="figureContext"></param>
+        </member>
+    </members>
+</doc>
