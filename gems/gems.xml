@@ -4,6 +4,26 @@
         <name>gems</name>
     </assembly>
     <members>
+        <member name="T:gems.Controllers.FiguresController">
+            <summary>
+            Implements WebApi controllers
+            </summary>
+            <param name="context"></param>
+            <param name="calculateDispatcher"></param>
+        </member>
+        <member name="M:gems.Controllers.FiguresController.#ctor(Gems.SqliteDb.Db.FigureDbContext,gems.common.Geometry.Calculators.ICalculateDispatcher)">
+            <summary>
+            Implements WebApi controllers
+            </summary>
+            <param name="context"></param>
+            <param name="calculateDispatcher"></param>
+        </member>
+        <member name="M:gems.Controllers.FiguresController.GetFigures">
+            <summary>
+            Returns all figures
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:gems.Controllers.FiguresController.GetFigure(System.Int64)">
              <summary>
              Calculates square for figure with requested Id.
@@ -15,7 +35,7 @@
              </remarks>
              <response code="200">Identificator of new figure</response>
         </member>
-        <member name="M:gems.Controllers.FiguresController.PutFigure(System.Int64,gems.common.Geometry.Figure)">
+        <member name="M:gems.Controllers.FiguresController.PutFigure(System.Int64,gems.common.Geometry.Figures.IFigure)">
              <summary>
              Accepts request body content as figure ("circle" and "triangle") and updates data in persistent storage.
              </summary>
@@ -47,7 +67,7 @@
              </remarks>
              <response code="204"></response>
         </member>
-        <member name="M:gems.Controllers.FiguresController.PostFigure(gems.common.Geometry.Figure)">
+        <member name="M:gems.Controllers.FiguresController.PostFigure(gems.common.Geometry.Figures.IFigure)">
              <summary>
              Accepts request body content as figure ("circle" and "triangle") and saves data in persistent storage.
              </summary>
@@ -89,6 +109,34 @@
             
              </remarks>
              <response code="200">Identificator of new figure</response>
+        </member>
+        <member name="T:gems.Program">
+            <summary>
+            The entry point of the class 
+            </summary>
+        </member>
+        <member name="M:gems.Program.Main(System.String[])">
+            <summary>
+            Entry point of the app
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:gems.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            Configure application
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:gems.Startup">
+            <summary>
+            Startup class, used to configure application during startup
+            </summary>
+        </member>
+        <member name="M:gems.Startup.#ctor">
+            <summary>
+            Startup class, used to configure application during startup
+            </summary>
         </member>
         <member name="M:gems.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
