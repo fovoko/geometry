@@ -10,6 +10,13 @@ using System.Reflection;
 using System.IO;
 using gems.common.Geometry.Figures;
 using gems.common.Geometry.Calculators;
+using gems.common.Geometry.Models;
+using gems.CQRS;
+using gems.Queries;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using gems.Commands;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace gems
 {
@@ -24,11 +31,20 @@ namespace gems
         /// <param name="services"></param>
         public static void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<FigureDbContext>();
+
+            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+            services.AddScoped<ICommandHandler<DeleteFigureCommand>, DeleteFigureCommandHandler>();
+            services.AddScoped<ICommandHandler<PostFigureCommand>, PostFigureCommandHandler>();
+            services.AddScoped<ICommandHandler<PutFigureCommand>, PutFigureCommandHandler>();
+
+            services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+            services.AddScoped<IQueryHandler<GetFiguresQuery, Task<IEnumerable<FigureDto>>>, GetFiguresQueryHandler>();
+            services.AddScoped<IQueryHandler<GetFigureQuery, ValueTask<FigureDto>>, GetFigureQueryHandler>();
+
             services.AddSingleton<ICalculator<Triangle>, CalculatorTriangle>();
             services.AddSingleton<ICalculator<Circle>, CalculatorCircle>();
             services.AddSingleton<ICalculateDispatcher, CalculatorDispatcher>();
-
-            services.AddDbContext<FigureDbContext>();
 
             services.AddControllers();
 
@@ -66,6 +82,10 @@ namespace gems
 
             services.AddSwaggerExamplesFromAssemblyOf(typeof(CircleExample));
             services.AddSwaggerExamplesFromAssemblyOf(typeof(TriangleExample));
+
+            services.AddHttpLogging(loggingOptions => 
+                loggingOptions.LoggingFields = HttpLoggingFields.RequestPropertiesAndHeaders
+            );
         }
 
         /// <summary>
@@ -85,6 +105,14 @@ namespace gems
                 c.RoutePrefix = string.Empty;
             });
 
+            //app.UseHttpLogging();
+            app.UseWhen(
+                x => 
+                    x.Request.Path == "/api/figure",
+                app => 
+                    app.UseHttpLogging()
+            );
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -97,9 +125,9 @@ namespace gems
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-             {
-                 endpoints.MapControllers();
-             });
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

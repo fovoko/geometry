@@ -1,24 +1,28 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Gems.SqliteDb.Db;
 using Swashbuckle.AspNetCore.Filters;
 using gems.common.Geometry.Figures;
 using gems.common.Geometry.Calculators;
 using gems.common.Geometry.Models;
+using gems.Commands;
+using gems.CQRS;
+using gems.Queries;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace gems.Controllers
 {
     /// <summary>
     /// Implements WebApi controllers
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="logger"></param>
     /// <param name="calculateDispatcher"></param>
+    /// <param name="commandDispatcher"></param>
+    /// <param name="queryDispatcher"></param>
     [Route("api/figure")]
     [ApiController]
-    public class FiguresController(FigureDbContext context, ICalculateDispatcher calculateDispatcher) : ControllerBase
+    public class FiguresController(ILogger<FiguresController> logger, ICalculateDispatcher calculateDispatcher, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) : ControllerBase
     {
 
         /// <summary>
@@ -28,7 +32,8 @@ namespace gems.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FigureDto>>> GetFigures()
         {
-            return await context.Figures.ToListAsync().ConfigureAwait(false);
+            var figures = await queryDispatcher.Execute<GetFiguresQuery, Task<IEnumerable<FigureDto>>>(new GetFiguresQuery());
+            return Ok(figures);
         }
 
         /// <summary>
@@ -43,7 +48,12 @@ namespace gems.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFigure(long id)
         {
-            FigureDto figure = await context.Figures.FindAsync(id).ConfigureAwait(false);
+            GetFigureQuery getFigureQuery = new()
+            {
+                Id = id
+            };
+
+            FigureDto figure = await queryDispatcher.Execute<GetFigureQuery, ValueTask<FigureDto>>(getFigureQuery);
 
             if (figure == null)
             {
@@ -87,30 +97,20 @@ namespace gems.Controllers
         [SwaggerRequestExample(typeof(IFigure), typeof(TriangleExample))]
         public async Task<IActionResult> PutFigure(long id, [FromBody] IFigure figure)
         {
-            var figureDto = new FigureDto()
+            var putFigureCommand = new PutFigureCommand()
             {
                 Id = id,
                 Geometry = figure
             };
 
-            context.Add(figureDto);
-
-            context.Entry(figureDto).State = EntityState.Modified;
-
             try
             {
-                await context.SaveChangesAsync().ConfigureAwait(false);
+                await commandDispatcher.Execute(putFigureCommand);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateException ex)
             {
-                if (!FigureExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                logger.LogWarning(ex, "Failed to update figure with id {id}", id);
+                return BadRequest($"Failed to update figure with id {id}");
             }
 
             return NoContent();
@@ -150,17 +150,14 @@ namespace gems.Controllers
         [SwaggerRequestExample(typeof(IFigure), typeof(CircleExample))]
         public async Task<IActionResult> PostFigure([FromBody] IFigure figure)
         {
-            var figureParsed = figure as IFigure;
-
-            var figureDto = new FigureDto()
-            {
-                Geometry = figureParsed
+            PostFigureCommand postFigureCommand = new()
+            { 
+                Geometry = figure
             };
 
-            await context.Figures.AddAsync(figureDto).ConfigureAwait(false);
-            await context.SaveChangesAsync().ConfigureAwait(false);
+            long newId = await commandDispatcher.Execute(postFigureCommand);
 
-            return Ok(figureDto.Id);
+            return Ok(newId);
         }
 
         /// <summary>
@@ -175,23 +172,25 @@ namespace gems.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFigure(long id)
         {
-            var figure = await context.Figures.FindAsync(id).ConfigureAwait(false);
+            GetFigureQuery getFigureQuery = new()
+            {
+                Id = id
+            };
+            FigureDto figure = await queryDispatcher.Execute<GetFigureQuery, ValueTask<FigureDto>>(getFigureQuery);
+
             if (figure == null)
             {
                 return NotFound();
             }
 
-            context.Figures.Remove(figure);
-            await context.SaveChangesAsync().ConfigureAwait(false);
+            DeleteFigureCommand deleteFigureCommand = new()
+            {
+                Id = id
+            };
+
+            await commandDispatcher.Execute(deleteFigureCommand);
 
             return Ok(figure);
         }
-
-
-        private bool FigureExists(long id)
-        {
-            return context.Figures.Any(x => x.Id == id);
-        }
-
     }
 }

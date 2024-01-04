@@ -4,19 +4,100 @@
         <name>gems</name>
     </assembly>
     <members>
+        <member name="T:gems.Commands.DeleteFigureCommand">
+            <summary>
+            Command to delete figure
+            </summary>
+        </member>
+        <member name="P:gems.Commands.DeleteFigureCommand.Id">
+            <summary>
+            Id of the figure to delete
+            </summary>
+        </member>
+        <member name="T:gems.Commands.DeleteFigureCommandHandler">
+            <summary>
+            Class implementing figure deleting command
+            </summary>
+        </member>
+        <member name="M:gems.Commands.DeleteFigureCommandHandler.#ctor(Gems.SqliteDb.Db.FigureDbContext)">
+            <summary>
+            Class implementing figure deleting command
+            </summary>
+        </member>
+        <member name="M:gems.Commands.DeleteFigureCommandHandler.Execute(gems.Commands.DeleteFigureCommand)">
+            <summary>
+            Deletes figure by id from command
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:gems.Commands.PostFigureCommand">
+            <summary>
+            Command to create figure
+            </summary>
+        </member>
+        <member name="P:gems.Commands.PostFigureCommand.Geometry">
+            <summary>
+            Holds geometry object
+            </summary>
+        </member>
+        <member name="T:gems.Commands.PostFigureCommandHandler">
+            <summary>
+            Class implementing figure creation
+            </summary>
+        </member>
+        <member name="M:gems.Commands.PostFigureCommandHandler.#ctor(Gems.SqliteDb.Db.FigureDbContext)">
+            <summary>
+            Class implementing figure creation
+            </summary>
+        </member>
+        <member name="M:gems.Commands.PostFigureCommandHandler.Execute(gems.Commands.PostFigureCommand)">
+            <summary>
+            Creates new figure in repository from command figure
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:gems.Commands.PutFigureCommand">
+            <summary>
+            Command to update figure
+            </summary>
+        </member>
+        <member name="T:gems.Commands.PutFigureCommandHandler">
+            <summary>
+            Class implementing figure updating
+            </summary>
+        </member>
+        <member name="M:gems.Commands.PutFigureCommandHandler.#ctor(Gems.SqliteDb.Db.FigureDbContext)">
+            <summary>
+            Class implementing figure updating
+            </summary>
+        </member>
+        <member name="M:gems.Commands.PutFigureCommandHandler.Execute(gems.Commands.PutFigureCommand)">
+            <summary>
+            Updates figure by id with figure from command
+            </summary>
+            <param name="command"></param>
+        </member>
         <member name="T:gems.Controllers.FiguresController">
             <summary>
             Implements WebApi controllers
             </summary>
-            <param name="context"></param>
+            <param name="logger"></param>
             <param name="calculateDispatcher"></param>
+            <param name="commandDispatcher"></param>
+            <param name="queryDispatcher"></param>
         </member>
-        <member name="M:gems.Controllers.FiguresController.#ctor(Gems.SqliteDb.Db.FigureDbContext,gems.common.Geometry.Calculators.ICalculateDispatcher)">
+        <member name="M:gems.Controllers.FiguresController.#ctor(Microsoft.Extensions.Logging.ILogger{gems.Controllers.FiguresController},gems.common.Geometry.Calculators.ICalculateDispatcher,gems.CQRS.ICommandDispatcher,gems.CQRS.IQueryDispatcher)">
             <summary>
             Implements WebApi controllers
             </summary>
-            <param name="context"></param>
+            <param name="logger"></param>
             <param name="calculateDispatcher"></param>
+            <param name="commandDispatcher"></param>
+            <param name="queryDispatcher"></param>
         </member>
         <member name="M:gems.Controllers.FiguresController.GetFigures">
             <summary>
@@ -110,6 +191,113 @@
              </remarks>
              <response code="200">Identificator of new figure</response>
         </member>
+        <member name="T:gems.CQRS.CommandDispatcher">
+            <summary>
+            Iplementation of the class to work with query handlers
+            </summary>
+            <param name="serviceProvider"></param>
+        </member>
+        <member name="M:gems.CQRS.CommandDispatcher.#ctor(System.IServiceProvider)">
+            <summary>
+            Iplementation of the class to work with query handlers
+            </summary>
+            <param name="serviceProvider"></param>
+        </member>
+        <member name="M:gems.CQRS.CommandDispatcher.Execute``1(``0)">
+            <summary>
+            Gets correct handler by TQuery and executes it
+            </summary>
+            <typeparam name="TCommand"></typeparam>
+            <param name="command"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:gems.CQRS.ICommand">
+            <summary>
+            Represent command to update data
+            </summary>
+        </member>
+        <member name="T:gems.CQRS.ICommandDispatcher">
+            <summary>
+            Interface to operate with ICommand handler
+            </summary>
+        </member>
+        <member name="M:gems.CQRS.ICommandDispatcher.Execute``1(``0)">
+            <summary>
+            Gets correct handler by TQuery and executes it
+            </summary>
+            <typeparam name="TCommand"></typeparam>
+            <param name="command"></param>
+        </member>
+        <member name="T:gems.CQRS.ICommandHandler`1">
+            <summary>
+            Represents handler for IQuery 
+            </summary>
+            <typeparam name="TCommand"></typeparam>
+        </member>
+        <member name="M:gems.CQRS.ICommandHandler`1.Execute(`0)">
+            <summary>
+            ICommand executor, it accepts ICommand argument query
+            </summary>
+            <param name="command"></param>
+        </member>
+        <member name="T:gems.CQRS.IQuery`1">
+            <summary>
+            Represents query to get data
+            </summary>
+            <typeparam name="TResult"></typeparam>
+        </member>
+        <member name="T:gems.CQRS.IQueryDispatcher">
+            <summary>
+            Interface to operate with IQuery handler
+            </summary>
+        </member>
+        <member name="M:gems.CQRS.IQueryDispatcher.Execute``2(``0)">
+            <summary>
+            Gets correct handler by TQuery, executes it and returns result
+            </summary>
+            <typeparam name="TQuery"></typeparam>
+            <typeparam name="TResult"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="T:gems.CQRS.IQueryHandler`2">
+            <summary>
+            Represents handler for IQuery 
+            </summary>
+            <typeparam name="TQuery"></typeparam>
+            <typeparam name="TResult"></typeparam>
+        </member>
+        <member name="M:gems.CQRS.IQueryHandler`2.Execute(`0)">
+            <summary>
+            IQuery executor, it accepts IQuery argument query and returns TResult
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="T:gems.CQRS.QueryDispatcher">
+            <summary>
+            Operates with query handlers
+            </summary>
+            <param name="serviceProvider"></param>
+        </member>
+        <member name="M:gems.CQRS.QueryDispatcher.#ctor(System.IServiceProvider)">
+            <summary>
+            Operates with query handlers
+            </summary>
+            <param name="serviceProvider"></param>
+        </member>
+        <member name="M:gems.CQRS.QueryDispatcher.Execute``2(``0)">
+            <summary>
+            Gets correct handler by TQuery, executes it and returns result
+            </summary>
+            <typeparam name="TQuery"></typeparam>
+            <typeparam name="TResult"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
         <member name="T:gems.Program">
             <summary>
             The entry point of the class 
@@ -127,6 +315,57 @@
             </summary>
             <param name="args"></param>
             <returns></returns>
+        </member>
+        <member name="T:gems.Queries.GetFigureQuery">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:gems.Queries.GetFigureQuery.Id">
+            <summary>
+             
+            </summary>
+        </member>
+        <member name="T:gems.Queries.GetFigureQueryHandler">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:gems.Queries.GetFigureQueryHandler.#ctor(Gems.SqliteDb.Db.FigureDbContext)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:gems.Queries.GetFigureQueryHandler.Execute(gems.Queries.GetFigureQuery)">
+            <summary>
+            
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:gems.Queries.GetFiguresQuery">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:gems.Queries.GetFiguresQueryHandler">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:gems.Queries.GetFiguresQueryHandler.#ctor(Gems.SqliteDb.Db.FigureDbContext)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:gems.Queries.GetFiguresQueryHandler.Execute(gems.Queries.GetFiguresQuery)">
+            <summary>
+            
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="T:gems.Startup">
             <summary>

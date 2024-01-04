@@ -27,7 +27,6 @@ namespace gems.tests
             mockServiceProvider = new Mock<IServiceProvider>();
             mockServiceProvider.Setup(o => o.GetService(typeof(ICalculator<Circle>))).Returns(new CalculatorCircle());
             mockServiceProvider.Setup(o => o.GetService(typeof(ICalculator<Triangle>))).Returns(new CalculatorTriangle());
-
         }
 
         [Theory]

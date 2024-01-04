@@ -9,7 +9,8 @@ This demo shows next technologies:
 1. Custom Text.Json converter for polymorphic deserialization/serialization, the subtype is determined through property name of json object.
 2. Swashbuckle powered. Includes example as Xml comments for POST /api/figure.
 3. SOLID principles, it is easy to add new geometry figure - we should not touch other classes.
-4. Unit tests use inMemory db.
+4. CQRS
+5. Unit tests use inMemory db.
 
 ## Assumptions
 
@@ -23,7 +24,7 @@ This demo shows next technologies:
 
     POST /api/figure
     {
-        "circle": 
+        "circle":
         {
             "center": {"x": 2, "y": 2},
             "radius": 10
@@ -34,7 +35,7 @@ This demo shows next technologies:
 
     POST /api/figure
     {
-        "triangle": 
+        "triangle":
         {
             "a": {"x": 0, "y": 0},
             "b": {"x": 0, "y": 3},
